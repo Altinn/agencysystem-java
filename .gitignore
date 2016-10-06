@@ -16,8 +16,14 @@ hs_err_pid*
 
 
 # Intellij IDE files
-
+# Download Queue
 outbound/download-queue/data/
 outbound/download-queue/target/
 outbound/download-queue/.idea/workspace.xml
 outbound/download-queue/.idea/tasks.xml
+
+#External Attachment Receiver
+outbound/external-attachment-receiver/data/
+outbound/external-attachment-receiver/target/
+outbound/external-attachment-receiver/.idea/workspace.xml
+outbound/external-attachment-receiver/.idea/tasks.xml
