@@ -16,5 +16,6 @@ hs_err_pid*
 
 outbound/download-queue/data/
 outbound/download-queue/target/
+outbound/download-queue/error-log.log
 outbound/download-queue/.idea/workspace.xml
 outbound/download-queue/.idea/tasks.xml
