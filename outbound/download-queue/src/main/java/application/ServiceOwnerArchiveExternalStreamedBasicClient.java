@@ -21,11 +21,18 @@ public class ServiceOwnerArchiveExternalStreamedBasicClient {
     private String systemUsername;
     private String systemPassword;
 
+    IServiceOwnerArchiveExternalStreamedBasic port;
 
     public ServiceOwnerArchiveExternalStreamedBasicClient(String serviceEndpoint, String systemUsername, String systemPassword) {
         this.serviceEndpoint = serviceEndpoint;
         this.systemUsername = systemUsername;
         this.systemPassword = systemPassword;
+
+        port = new ServiceOwnerArchiveExternalStreamedBasicSF().
+                getBasicHttpBindingIServiceOwnerArchiveExternalStreamedBasic();
+        BindingProvider bp = (BindingProvider) port;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                serviceEndpoint);
     }
 
     /**
@@ -35,11 +42,6 @@ public class ServiceOwnerArchiveExternalStreamedBasicClient {
      * @throws Exception Throws an exception if it failed to retrieve the attachment from the server.
      */
     public byte[] getDownloadQueueItems(int attachmentId) throws Exception {
-        IServiceOwnerArchiveExternalStreamedBasic port = new ServiceOwnerArchiveExternalStreamedBasicSF().
-                getBasicHttpBindingIServiceOwnerArchiveExternalStreamedBasic();
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                serviceEndpoint);
         byte[] attachmentDataStreamedBasic = port.getAttachmentDataStreamedBasic(systemUsername, systemPassword, attachmentId);
         return attachmentDataStreamedBasic;
     }

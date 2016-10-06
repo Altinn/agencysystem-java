@@ -17,19 +17,23 @@ import java.util.List;
  */
 public class DownloadQueueClient {
 
-    private String serviceEndpoint;
     private String systemUsername;
     private String systemPassword;
     private String serviceCode;
     private int languageId;
+    IDownloadQueueExternalBasic port;
 
     public DownloadQueueClient(String serviceEndpoint, String systemUsername, String systemPassword,
                                String serviceCode, int languageId) {
-        this.serviceEndpoint = serviceEndpoint;
         this.systemUsername = systemUsername;
         this.systemPassword = systemPassword;
         this.serviceCode = serviceCode;
         this.languageId = languageId;
+
+        this.port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
+        BindingProvider bp = (BindingProvider) port;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                serviceEndpoint);
     }
 
     /**
@@ -39,10 +43,6 @@ public class DownloadQueueClient {
      * @throws Exception Throws an exception if it failed to retrieve the items.
      */
     public List<DownloadQueueItemBE> getDownloadQueueItems() throws Exception {
-        IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                serviceEndpoint);
         DownloadQueueItemBEList downloadQueueItems = port.getDownloadQueueItems(systemUsername, systemPassword, serviceCode);
         return downloadQueueItems.getDownloadQueueItemBE();
     }
@@ -55,26 +55,18 @@ public class DownloadQueueClient {
      * @throws Exception Throws an exception if it failed to retrieve the pdf from the server
      */
     public byte[] getFormSetPdfBasic(String archiveReference) throws Exception {
-        IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                serviceEndpoint);
-        byte[] formSetPdfBasic = port.getFormSetPdfBasic(systemUsername, systemPassword,
-                archiveReference, languageId);
+        byte[] formSetPdfBasic = port.getFormSetPdfBasic(systemUsername, systemPassword, archiveReference, languageId);
         return formSetPdfBasic;
     }
 
     /**
      * Retrieves attachments using the IDownloadQueueExternalBasic interface based on archive reference.
+     *
      * @param archiveReference Used to identify the item on the download queue.
      * @return A list of archived attachments.
      * @throws Exception Throws and exception if it failed to retrieve the attachments form the server.
      */
     public ArchivedAttachmentExternalListDQBE getArchivedFormTaskBasicDQ(String archiveReference) throws Exception {
-        IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                serviceEndpoint);
         ArchivedFormTaskDQBE archivedFormTaskBasicDQ = port.getArchivedFormTaskBasicDQ(systemUsername, systemPassword,
                 archiveReference, languageId);
         return archivedFormTaskBasicDQ.getAttachments().getValue();
@@ -82,14 +74,11 @@ public class DownloadQueueClient {
 
     /**
      * Using the IDownloadQueueExternalBasic interface, it marks  an item on the download queue as purged. It can no longer be fetches by "getDownloadQueueItems".
+     *
      * @param archiveReference Used to identify the item on the download queue.
      * @throws Exception Throws an exception if the purge failed.
      */
     public void purgeItem(String archiveReference) throws Exception {
-        IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
-        BindingProvider bp = (BindingProvider) port;
-        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                serviceEndpoint);
         port.purgeItem(systemUsername, systemPassword, archiveReference);
     }
 }
