@@ -52,7 +52,7 @@ public class DownloadQueueHandler {
         }
 
         // Process the download queue. Can be time consuming.
-        logger.info("Processing items...");
+        logger.info("Processing: " + limit + " (limit) items...");
         for (int i = 0; i < limit; i++) {
             String archiveReference = downloadQueue.get(i).getArchiveReference().getValue();
             try {
