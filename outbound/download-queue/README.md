@@ -1,5 +1,5 @@
 # Download Queue
-This is a client that consumes elements from the Altinn download queue. The client requests items from the queue, saves them to disk, and marks it as "purged" (completed).
+This is a client that consumes elements from the Altinn download queue. The client requests items from the queue, saves them to disk, and marks them as "purged" (completed).
 
 What you will need to run this project:
 
