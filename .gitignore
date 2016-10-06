@@ -8,6 +8,9 @@
 *.war
 *.ear
 
+# Log-file
+*.log
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
@@ -16,6 +19,5 @@ hs_err_pid*
 
 outbound/download-queue/data/
 outbound/download-queue/target/
-outbound/download-queue/error-log.log
 outbound/download-queue/.idea/workspace.xml
 outbound/download-queue/.idea/tasks.xml

@@ -1,8 +1,11 @@
+import org.apache.log4j.Logger;
 
 /**
  * Created by andreas.naess on 05.10.2016.
  */
 public class Application {
+
+    final static Logger logger = Logger.getLogger(Application.class);
 
     private static final String SERVICE_ENDPOINT =
             "https://tt02.altinn.basefarm.net/ArchiveExternal/DownloadQueueExternalBasic.svc";
@@ -25,6 +28,7 @@ public class Application {
 
         DownloadQueueHandler queueHandler = new DownloadQueueHandler(downloadQueueClient, streamClient, limit);
         // Process the download queue
+        logger.info("Starting...");
         queueHandler.run();
     }
 }
