@@ -3,6 +3,11 @@ import org.apache.log4j.Logger;
 /**
  * Created by andreas.naess on 05.10.2016.
  */
+
+/**
+ * This is an example application which uses the download queue web service. It acts as a client, which requests items
+ * from the download queue, writes each item to disk and finally marks the item as "purged" (completed).
+ */
 public class Application {
 
     final static Logger logger = Logger.getLogger(Application.class);

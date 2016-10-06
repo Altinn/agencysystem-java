@@ -30,6 +30,12 @@ public class DownloadQueueClient {
         this.languageId = languageId;
     }
 
+    /**
+     * Retrieves the download queue by using the IDownloadQueueExternalBasic interface.
+     *
+     * @return A list of download queue items.
+     * @throws Exception Throws an exception if it failed to retrieve the items.
+     */
     public List<DownloadQueueItemBE> getDownloadQueueItems() throws Exception {
         IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
         BindingProvider bp = (BindingProvider) port;
@@ -39,6 +45,13 @@ public class DownloadQueueClient {
         return downloadQueueItems.getDownloadQueueItemBE();
     }
 
+    /**
+     * Retrieves the pdf using the IDownloadQueueExternalBasic interface based on archive reference.
+     *
+     * @param archiveReference Used to identify the item on the download queue.
+     * @return The pdf as a byte array.
+     * @throws Exception Throws an exception if it failed to retrieve the pdf from the server
+     */
     public byte[] getFormSetPdfBasic(String archiveReference) throws Exception {
         IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
         BindingProvider bp = (BindingProvider) port;
@@ -49,6 +62,12 @@ public class DownloadQueueClient {
         return formSetPdfBasic;
     }
 
+    /**
+     * Retrieves attachments using the IDownloadQueueExternalBasic interface based on archive reference.
+     * @param archiveReference Used to identify the item on the download queue.
+     * @return A list of archived attachments.
+     * @throws Exception Throws and exception if it failed to retrieve the attachments form the server.
+     */
     public ArchivedAttachmentExternalListDQBE getArchivedFormTaskBasicDQ(String archiveReference) throws Exception {
         IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
         BindingProvider bp = (BindingProvider) port;
@@ -59,12 +78,16 @@ public class DownloadQueueClient {
         return archivedFormTaskBasicDQ.getAttachments().getValue();
     }
 
-    public String purgeItem(String archiveReference) throws Exception {
+    /**
+     * Using the IDownloadQueueExternalBasic interface, it marks  an item on the download queue as purged. It can no longer be fetches by "getDownloadQueueItems".
+     * @param archiveReference Used to identify the item on the download queue.
+     * @throws Exception Throws an exception if the purge failed.
+     */
+    public void purgeItem(String archiveReference) throws Exception {
         IDownloadQueueExternalBasic port = new DownloadQueueExternalBasic().getBasicHttpBindingIDownloadQueueExternalBasic();
         BindingProvider bp = (BindingProvider) port;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                 serviceEndpoint);
-        String status = port.purgeItem(systemUsername, systemPassword, archiveReference);
-        return status;
+        port.purgeItem(systemUsername, systemPassword, archiveReference);
     }
 }

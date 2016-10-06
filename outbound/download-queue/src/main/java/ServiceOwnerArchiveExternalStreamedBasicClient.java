@@ -19,12 +19,19 @@ public class ServiceOwnerArchiveExternalStreamedBasicClient {
     private String systemUsername;
     private String systemPassword;
 
+
     public ServiceOwnerArchiveExternalStreamedBasicClient(String serviceEndpoint, String systemUsername, String systemPassword) {
         this.serviceEndpoint = serviceEndpoint;
         this.systemUsername = systemUsername;
         this.systemPassword = systemPassword;
     }
 
+    /**
+     * Retrieves a large attachment using the IServiceOwnerArchiveExternalStreamedBasic interface based on attachment ID.
+     * @param attachmentId A unique ID which identifies the attachment.
+     * @return The attachment as a byte array.
+     * @throws Exception Throws an exception if it failed to retrieve the attachment from the server.
+     */
     public byte[] getDownloadQueueItems(int attachmentId) throws Exception {
         IServiceOwnerArchiveExternalStreamedBasic port = new ServiceOwnerArchiveExternalStreamedBasicSF().
                 getBasicHttpBindingIServiceOwnerArchiveExternalStreamedBasic();

@@ -30,7 +30,12 @@ public class DownloadQueueHandler {
     }
 
     /**
-     * Processes the download queue.
+     * Processes the download queue in the following order:
+     * - Get the download queue
+     * - Loop through the queue. The limit variable limits the number of loops, as it is time consuming to process all
+     * elements.
+     * - Write each item which includes a pdf and attachment to disk
+     * - Mark the item as purged, so that it cannot be fetched again
      */
     public void run() {
         // Get the download queue.
@@ -91,13 +96,6 @@ public class DownloadQueueHandler {
         }
     }
 
-    /**
-     * Retrieves pdf based on archive reference
-     *
-     * @param archiveReference Used to identify items in the download queue.
-     * @return The pdf as a byte array
-     * @throws Exception Throws an exception if it failed to retrieve the pdf from the server
-     */
     private byte[] getPdf(String archiveReference) throws Exception {
         byte[] pdf;
 
@@ -111,13 +109,6 @@ public class DownloadQueueHandler {
         return pdf;
     }
 
-    /**
-     * Retrieves a large attachment based on archive reference
-     *
-     * @param attachmentId Used to identify the attachment.
-     * @return The attachment as a byte array
-     * @throws Exception Throws an exception if it failed to retrieve the attachment from the server
-     */
     private byte[] getLargeAttachment(int attachmentId) throws Exception {
         byte[] attachment;
 
@@ -131,13 +122,6 @@ public class DownloadQueueHandler {
         return attachment;
     }
 
-    /**
-     * Retrieves attachments based on archive reference
-     *
-     * @param archiveReference Used to identify items in the download queue.
-     * @return A list of archived attachments
-     * @throws Exception Throws and exception if it failed to retrieve the attachments form the server
-     */
     private List<ArchivedAttachmentDQBE> getArchiveFormTaskAttachments(String archiveReference) throws Exception {
         List<ArchivedAttachmentDQBE> archivedAttachmentDQBE;
 
@@ -152,12 +136,6 @@ public class DownloadQueueHandler {
         return archivedAttachmentDQBE;
     }
 
-    /**
-     * Marks an item in the download queue as purged. It can no longer be fetches by "getDownloadQueueItems"
-     *
-     * @param archiveReference A download queue item ID.
-     * @throws Exception Throws an exception if the purge failed.
-     */
     private void purgeItem(String archiveReference) throws Exception {
         try {
             downloadQueueClient.purgeItem(archiveReference);
@@ -167,12 +145,6 @@ public class DownloadQueueHandler {
         }
     }
 
-    /**
-     * Retrives the download queue
-     *
-     * @return Download queue items
-     * @throws Exception Throws an exception if it failed to retrive the download queue.
-     */
     private List<DownloadQueueItemBE> getDownloadQueue() throws Exception {
         List<DownloadQueueItemBE> downloadQueueItems;
         // Retrieves the download queue
@@ -191,13 +163,6 @@ public class DownloadQueueHandler {
         return downloadQueueItems;
     }
 
-    /**
-     * Writes the pdf to disk in a folder "data" in the project root folder
-     *
-     * @param pdf              Byte array of the pdf to be written
-     * @param archiveReference The archive reference is used to name the folder and pdf written in the "data" folder
-     * @throws IOException Throws and logs an exception if the writing failed
-     */
     private void writePdf(byte[] pdf, String archiveReference) throws IOException {
         File dataRootFolder = new File("data/");
         File dataArchiveFolder = new File("data/" + archiveReference);
@@ -212,15 +177,6 @@ public class DownloadQueueHandler {
         }
     }
 
-    /**
-     * Writes the attachments to disk in the path "data/'archive-reference'", where the archive reference is the item's
-     * unique ID.
-     *
-     * @param attachmentData   Byte array of the attachment to be written
-     * @param archiveReference The archive reference is used to get the correct file path.
-     * @param fileName         Used to name the attachment with the correct extension.
-     * @throws IOException Throws and logs an exception if the writing failed
-     */
     private void writeAttachment(byte[] attachmentData, String archiveReference, String fileName) throws IOException {
         File filePath = new File("data/" + archiveReference + "/" + fileName);
         try {
