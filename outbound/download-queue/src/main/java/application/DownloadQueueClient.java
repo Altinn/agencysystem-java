@@ -1,3 +1,5 @@
+package application;
+
 import downloadqueue.*;
 
 import javax.xml.ws.BindingProvider;

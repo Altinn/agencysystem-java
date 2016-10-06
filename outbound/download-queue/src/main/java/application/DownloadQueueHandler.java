@@ -1,3 +1,5 @@
+package application;
+
 import downloadqueue.ArchivedAttachmentDQBE;
 import downloadqueue.DownloadQueueItemBE;
 import org.apache.commons.io.FileUtils;
