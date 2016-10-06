@@ -10,3 +10,11 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+
+# Intellij IDE files
+
+outbound/download-queue/data/
+outbound/download-queue/target/
+outbound/download-queue/.idea/workspace.xml
+outbound/download-queue/.idea/tasks.xml
