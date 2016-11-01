@@ -1,5 +1,6 @@
 package application;
 
+import application.util.Constants;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -14,15 +15,9 @@ import java.io.*;
 public class FileHandler {
 
     private String receiversReference;
-    private File dataDirectory = new File("data");
 
     public FileHandler(String receiversReference) {
         this.receiversReference = receiversReference;
-
-        // This is only true the first the application runs
-        if (dataDirectory.mkdir()) {
-            System.out.println("Data folder created");
-        }
     }
 
     /**
@@ -37,15 +32,15 @@ public class FileHandler {
     public File write(String dataBatch, byte[] attachments) throws IOException {
 
         // Create directory
-        File directoryPath = new File(dataDirectory + "/" + receiversReference);
+        File directoryPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference);
         directoryPath.mkdir();
 
         if (attachments != null && attachments.length != 0) {
-            File attachmentPath = new File(dataDirectory + "/" + receiversReference + "/" + receiversReference + ".zip");
+            File attachmentPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference + "/" + receiversReference + ".zip");
             FileUtils.writeByteArrayToFile(attachmentPath, attachments);
         }
 
-        File dataBatchPath = new File(dataDirectory + "/" + receiversReference + "/" + receiversReference + ".xml");
+        File dataBatchPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference + "/" + receiversReference + ".xml");
         FileUtils.write(dataBatchPath, dataBatch, "UTF-8");
         return dataBatchPath;
     }
@@ -57,7 +52,7 @@ public class FileHandler {
      * @return True if the file exists, false if not.
      */
     public boolean fileExists() {
-        return new File(dataDirectory + "/" + receiversReference).exists();
+        return new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference).exists();
     }
 
 }

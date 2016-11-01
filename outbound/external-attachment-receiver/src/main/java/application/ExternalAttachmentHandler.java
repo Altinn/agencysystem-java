@@ -1,8 +1,6 @@
 package application;
 
-import generated.DataBatch;
-import generated.OnlineBatchReceipt;
-import generated.ResultCodeType;
+import generated.*;
 import no.altinn.webservices.ReceiveOnlineBatchExternalAttachment;
 import no.altinn.webservices.ReceiveOnlineBatchExternalAttachmentResponse;
 import org.apache.log4j.Logger;
@@ -50,7 +48,10 @@ public class ExternalAttachmentHandler {
             unmarshaller.setSchema(schema);
 
             StringReader reader = new StringReader(batch);
-            unmarshaller.unmarshal(reader);
+            DataBatch dataBatch = (DataBatch) unmarshaller.unmarshal(reader);
+            DataUnits dataUnits = dataBatch.getDataUnits();
+            for (DataUnit dataUnit : dataUnits.getDataUnit()) {
+            }
         } catch (UnmarshalException e) {
             // Only client errors
             logger.error("Feil med data/schema - " + e);
