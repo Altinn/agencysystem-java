@@ -2,6 +2,7 @@ package application;
 
 import application.util.Constants;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -15,6 +16,8 @@ import java.io.*;
 public class FileHandler {
 
     private String receiversReference;
+
+    final static Logger logger = Logger.getLogger(FileHandler.class);
 
     public FileHandler(String receiversReference) {
         this.receiversReference = receiversReference;
@@ -32,27 +35,39 @@ public class FileHandler {
     public File write(String dataBatch, byte[] attachments) throws IOException {
 
         // Create directory
-        File directoryPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference);
+        File directoryPath = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference);
         directoryPath.mkdir();
 
         if (attachments != null && attachments.length != 0) {
-            File attachmentPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference + "/" + receiversReference + ".zip");
+            File attachmentPath = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference + "/" + receiversReference + ".zip");
             FileUtils.writeByteArrayToFile(attachmentPath, attachments);
         }
 
-        File dataBatchPath = new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference + "/" + receiversReference + ".xml");
+        File dataBatchPath = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference + "/" + receiversReference + ".xml");
         FileUtils.write(dataBatchPath, dataBatch, "UTF-8");
         return dataBatchPath;
     }
 
     /**
      * Before writing the dataBatch to disk, it is important to check if it already exists.
-     * This is accomplished by checking the receivers reference for uniqueness.
+     * This is accomplished by checking the receivers reference for uniqueness. Checks both the archive- and corrupt-
+     * folder.
      *
      * @return True if the file exists, false if not.
      */
     public boolean fileExists() {
-        return new File(Constants.DATA_BATCH_DIRECTORY_PATH + "/" + receiversReference).exists();
-    }
+        File dataBatachArchiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH + "/" + receiversReference);
+        if (dataBatachArchiveFolder.exists()) {
+            logger.info("A file with the same receivers reference(" + dataBatachArchiveFolder.getPath() +")already exists; do not write to disk.");
+            return true;
+        }
 
+        File dataBatachCorruptFolder = new File(Constants.CORRUPT_DIRECTORY_PATH + "/" + receiversReference);
+        if (dataBatachCorruptFolder.exists()) {
+            logger.info("A file with the same receivers reference(" + dataBatachCorruptFolder.getPath() +")already exists; do not write to disk.");
+            return true;
+        }
+
+        return false;
+    }
 }

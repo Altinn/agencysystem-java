@@ -1,18 +1,12 @@
 package application;
 
-import application.util.ConfigLoader;
 import application.util.Constants;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Created by andreas.naess on 29.09.2016.
@@ -30,19 +24,30 @@ public class Application {
 
     public static void main(String[] args) {
 
-            File dataBatchDirectory = new File(Constants.DATA_BATCH_DIRECTORY_PATH);
-            File archiveDirectory = new File(Constants.ARCHIVE_DIRECTORY_PATH);
+        File dataRootFolder = new File(Constants.DATA_ROOT_PATH);
+        File tempDataFolder = new File(Constants.TEMP_DATA_PATH);
+        File archiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH);
+        File corruptedFolder = new File(Constants.CORRUPT_DIRECTORY_PATH);
 
-            // This is only true the first the application runs
-            if (dataBatchDirectory.mkdir()) {
-                System.out.println("temp-data folder created");
-            }
+        // This is only true the first the application runs
 
-            if (archiveDirectory.mkdir()) {
-                System.out.println("archive folder created");
-            }
+        if (dataRootFolder.mkdir()) {
+            System.out.println("root data folder created");
+        }
 
-            SpringApplication.run(Application.class, args);
+        if (tempDataFolder.mkdir()) {
+            System.out.println("temp-data folder created");
+        }
+
+        if (archiveFolder.mkdir()) {
+            System.out.println("archive folder created");
+        }
+
+        if (corruptedFolder.mkdir()) {
+            System.out.println("\"corrupted\" folder created");
+        }
+
+        SpringApplication.run(Application.class, args);
     }
 }
 

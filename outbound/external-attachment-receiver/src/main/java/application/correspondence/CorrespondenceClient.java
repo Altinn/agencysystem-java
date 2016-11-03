@@ -30,7 +30,6 @@ public class CorrespondenceClient {
     // Correspondence properties
     private static String serviceCode;
     private static String serviceEdition;
-    private static String reportee;
 
     // Correspondence content properties
     private static String languageCode;
@@ -64,7 +63,6 @@ public class CorrespondenceClient {
         // Correspondence properties
         this.serviceCode = properties.getProperty("serviceCode");
         this.serviceEdition = properties.getProperty("serviceEdition");
-        this.reportee = properties.getProperty("reportee");
 
         // Correspondence content properties
         this.languageCode = properties.getProperty("languageCode");
@@ -86,23 +84,30 @@ public class CorrespondenceClient {
         BindingProvider bp = (BindingProvider) port;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                 CORRESPONDENCE_ENDPOINT_URI);
+
+
     }
 
     /**
-     * Creates and inserts a correspondence
+     * Creates and sends a correspondence after processing the databatch.
      *
+     * @param archiveReference The data batch archive reference
+     * @param reportee         The organization that should receive the correspondence
      * @return
      * @throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage
      */
-    public ReceiptExternal createCorrespondence()
+    public ReceiptExternal createAndSendCorrespondence(String archiveReference, String reportee)
             throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage {
 
         InsertCorrespondenceV2 correspondence = new InsertCorrespondenceV2();
         ObjectFactory objectFactory = new ObjectFactory();
 
+        // Ensures the correspondence is delivered to the correct organization
+        correspondence.setReportee(objectFactory.createInsertCorrespondenceV2Reportee(reportee));
+        correspondence.setArchiveReference(objectFactory.createInsertCorrespondenceV2ArchiveReference(archiveReference));
+
         correspondence.setServiceCode(objectFactory.createInsertCorrespondenceV2ServiceCode(this.serviceCode));
         correspondence.setServiceEdition(objectFactory.createInsertCorrespondenceV2ServiceEdition(this.serviceEdition));
-        correspondence.setReportee(objectFactory.createInsertCorrespondenceV2Reportee(this.reportee));
 
         // Correspondence content
         ExternalContentV2 externalContentV2 = new ExternalContentV2();
@@ -117,7 +122,6 @@ public class CorrespondenceClient {
         correspondence.setAllowSystemDeleteDateTime(objectFactory.
                 createInsertCorrespondenceV2AllowSystemDeleteDateTime(this.allowSystemDeleteDateTime));
         correspondence.setDueDateTime(this.dueDateTime);
-
 
         return port.insertCorrespondenceBasicV2(this.agencyUsername, this.agencyPassword, this.systemUserCode, this.externalReference,
                 correspondence);

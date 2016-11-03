@@ -48,22 +48,19 @@ public class ExternalAttachmentHandler {
             unmarshaller.setSchema(schema);
 
             StringReader reader = new StringReader(batch);
-            DataBatch dataBatch = (DataBatch) unmarshaller.unmarshal(reader);
-            DataUnits dataUnits = dataBatch.getDataUnits();
-            for (DataUnit dataUnit : dataUnits.getDataUnit()) {
-            }
+            unmarshaller.unmarshal(reader);
         } catch (UnmarshalException e) {
             // Only client errors
-            logger.error("Feil med data/schema - " + e);
+            logger.error("Error with the data/schema - " + e);
             return ResultCodeType.FAILED_DO_NOT_RETRY;
         } catch (SAXException e) {
             // Includes both internal and client errors
-            logger.error("Internfeil - " + e);
+            logger.error("Unmarshalling error - " + e);
             return ResultCodeType.FAILED;
 
         } catch (JAXBException e) {
             // ALL other JAXB errors
-            logger.error("Internfeil - " + e);
+            logger.error("Unmarshalling error - " + e);
             return ResultCodeType.FAILED;
         }
 
@@ -78,7 +75,7 @@ public class ExternalAttachmentHandler {
         try {
             fileHandler.write(batch, request.getAttachments());
         } catch (IOException e) {
-            logger.error("Kunne ikke skrive fil til disk - " + e);
+            logger.error("Could not write to disk - " + e);
             return ResultCodeType.FAILED;
         }
         return ResultCodeType.OK;
@@ -106,7 +103,7 @@ public class ExternalAttachmentHandler {
             response.setReceiveOnlineBatchExternalAttachmentResult(sw.toString());
         } catch (JAXBException e) {
             e.printStackTrace();
-            logger.error("Internfeil - " + e);
+            logger.error("Unmarshalling error - " + e);
         }
         return response;
     }

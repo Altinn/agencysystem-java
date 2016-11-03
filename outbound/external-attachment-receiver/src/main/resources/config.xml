@@ -2,11 +2,6 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <comment>App settings</comment>
-    <entry key="archiveDirectory">archive</entry>
-    <entry key="dataBatchDirectory">temp-data</entry>
-
-
-
     <!--Agency settings-->
     <entry key="agencyUsername">AAS_TEST</entry>
     <entry key="agencyPassword">6GMSx5n8</entry>
@@ -15,7 +10,6 @@
     <!--Correspondence-->
     <entry key="serviceCode">3996</entry>
     <entry key="serviceEdition">201503</entry>
-    <entry key="reportee">910888560</entry>
 
     <!--Correspondence content-->
     <entry key="languageCode">1044</entry>
