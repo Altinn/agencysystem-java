@@ -161,7 +161,7 @@ public class ScheduledTasks {
             File destination = new File(this.archiveFolder.getPath() + File.separator + dataBatchFolder.getName());
             FileUtils.moveDirectory(dataBatchFolder, destination);
         } catch (IOException e) {
-            logger.error("Unable to move the databatch folder to archive: " + e);
+            logger.error("Unable to move the databatch folder(" + dataBatchFolder.getName() + ")to the archive folder: " + e);
         }
         return true;
     }
@@ -182,12 +182,12 @@ public class ScheduledTasks {
             String archiveReference = dataUnit.getArchiveReference();
             String reportee = dataUnit.getReportee();
 
-            ReceiptExternal receipt = null;
+            ReceiptExternal receipt;
             try {
                 receipt = correspondenceClient.createAndSendCorrespondence(archiveReference, reportee);
             } catch (ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage e) {
-                e.printStackTrace();
                 logger.error("Something went wrong when sending correspondence: " + e);
+                continue;
             }
             receiptList.add(new Pair(dataUnit.getArchiveReference(), receipt));
         }
@@ -202,8 +202,4 @@ public class ScheduledTasks {
             logger.error("Unable to move the databatch folder(" + dataBatchFolder.getName() + ")to the corrupted folder: " + e);
         }
     }
-}
-
-enum CorrespondenceResult {
-    CORRESPONDENCE_SUCCESS, CORRESPONDENCE_FAILED
 }
