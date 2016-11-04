@@ -50,24 +50,22 @@ public class FileHandler {
 
     /**
      * Before writing the dataBatch to disk, it is important to check if it already exists.
-     * This is accomplished by checking the receivers reference for uniqueness. Checks both the archive- and corrupt-
-     * folder.
+     * This is accomplished by checking the receivers reference for uniqueness.
      *
      * @return True if the file exists, false if not.
      */
     public boolean fileExists() {
         File dataBatachArchiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH + "/" + receiversReference);
         if (dataBatachArchiveFolder.exists()) {
-            logger.info("A file with the same receivers reference(" + dataBatachArchiveFolder.getPath() +")already exists; do not write to disk.");
+            logger.info("A file with the same receivers reference(" + dataBatachArchiveFolder.getPath() +")already exists; do not write to disk");
             return true;
         }
 
         File dataBatachCorruptFolder = new File(Constants.CORRUPT_DIRECTORY_PATH + "/" + receiversReference);
         if (dataBatachCorruptFolder.exists()) {
-            logger.info("A file with the same receivers reference(" + dataBatachCorruptFolder.getPath() +")already exists; do not write to disk.");
+            logger.info("A file with the same receivers reference(" + dataBatachCorruptFolder.getPath() +")already exists; do not write to disk");
             return true;
         }
-
         return false;
     }
 }

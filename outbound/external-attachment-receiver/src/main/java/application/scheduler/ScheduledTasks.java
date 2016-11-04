@@ -10,6 +10,9 @@ import no.altinn.schemas.services.intermediary.receipt._2009._10.ReceiptStatusEn
 import no.altinn.services.serviceengine.correspondence._2009._10.ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
@@ -20,62 +23,100 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.List;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 /**
  * Created by andreas.naess on 01.11.2016.
  */
 
+/**
+ * This class handles the creation and delivery of correspondences.
+ */
 @Component
 public class ScheduledTasks {
 
     final static Logger logger = Logger.getLogger(ScheduledTasks.class);
 
+    @Autowired
+    private ApplicationContext appContext;
+
     private File tempDataFolder;
     private File archiveFolder;
     private File corruptedFolder;
-    private List<Pair<String, ReceiptExternal>> archiveRefReceiptPairList;
+
+    private WatchService watcher;
+    private Path dir;
 
     public ScheduledTasks() {
         this.tempDataFolder = new File(Constants.TEMP_DATA_PATH);
         this.archiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH);
         this.corruptedFolder = new File(Constants.CORRUPT_DIRECTORY_PATH);
-    }
 
-    @Scheduled(fixedRate = 5000)
-    public void handleCorrespondence() {
-        File[] dataBatchFolders = tempDataFolder.listFiles();
-
-        this.archiveRefReceiptPairList = new ArrayList<>();
-
-        for (File dataBatchFolder : dataBatchFolders) {
-
-            switch (processCorrespondence(dataBatchFolder)) {
-                case UNMARSHALING_ERROR:
-                    // Could not unmarshal from XML to java-object. The contract was not met. Should move the databatch
-                    // to a corrupted files storage.
-                    moveToCorruptedFolder(dataBatchFolder, false);
-                    break;
-                case MOVE_DATABATCH_ERROR:
-                    // IO Error, Make sure you have read an write permissions
-                    break;
-                // If it reaches this point, then the databatch folder has successfully moved to the archive folder.
-                case SOME_CORRESPONDENCES_FAILED:
-                    // It managed to send some correspondence, while others failed. The data batch has been moved to
-                    // archive, and the errors have been logged
-                    break;
-                case ALL_CORRESPONDENCES_FAILED:
-                    // All correspondences failed, the databatch should be a corrupted files storage.
-                    moveToCorruptedFolder(dataBatchFolder, true);
-                case OK:
-                    // Everything OK, do nothing.
-                    break;
-            }
+        try {
+            this.watcher = FileSystems.getDefault().newWatchService();
+            this.dir = Paths.get(this.tempDataFolder.toURI());
+            dir.register(watcher, ENTRY_CREATE);
+            System.out.println("Watch Service registered for dir: " + dir.getFileName());
+        } catch (IOException e) {
+            logger.error("Could not watch the folder for changes. Server shutdown" + e);
+            SpringApplication.exit(appContext);
         }
     }
 
-    private CorrespondenceResult processCorrespondence(File dataBatchFolder) {
+    /**
+     * This method loops at a fixed rate every 5th second. It checks if a new file has been created in the data/temp-data
+     * folder. If a new file has been created, it will try and create and send a correspondence depending on the content of the
+     * data batch. It will move the content to the archive or corrupted folder depending on whether the correspondence was
+     * delivered successfully or not.
+     */
+    @Scheduled(fixedRate = 5000)
+    public void handleCorrespondence() {
+
+        // Watch key is used to watch for directory changes. In this case it only triggers if a new item has been created.
+        WatchKey key;
+        try {
+            key = watcher.take();
+        } catch (InterruptedException ex) {
+            return;
+        }
+
+        for (WatchEvent<?> event : key.pollEvents()) {
+            WatchEvent.Kind<?> kind = event.kind();
+
+            // This key is registered only for ENTRY_CREATE events, but an OVERFLOW event can occur regardless if events
+            // are lost or discarded.
+            if (kind == OVERFLOW) {
+                continue;
+            }
+
+            // The filename is the context of the event.
+            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+            Path filename = ev.context();
+
+            File dataBatchFolder = new File(Constants.TEMP_DATA_PATH + "/" + filename);
+
+            // If the correspondence failed, then move the databatch to the corrupted folder.
+            if (!processCorrespondence(dataBatchFolder)) {
+                moveToCorruptedFolder(dataBatchFolder);
+            }
+        }
+
+        // Reset the key -- this step is critical if you want to receive further watch events.
+        // If the key is no longer valid, the directory is inaccessible so exit the loop.
+        key.reset();
+    }
+
+    /**
+     * Processes the correspondence
+     *
+     * @param dataBatchFolder
+     * @return Returns true if success, false if it failed.
+     */
+    private boolean processCorrespondence(File dataBatchFolder) {
 
         File dataBatchFile = new File(dataBatchFolder.getPath() + "/" + dataBatchFolder.getName() + ".xml");
 
@@ -84,39 +125,45 @@ public class ScheduledTasks {
         // Unmarshall the databatch
         try {
             dataBatch = unmarshalXML(dataBatchFile);
-        }catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             logger.error("Unmarshalling error: " + e);
-            return CorrespondenceResult.UNMARSHALING_ERROR;
+            return false;
         }
 
         // If the dataBatch is null, then something went wrong during the unmarshalling
         if (dataBatch == null) {
-            return CorrespondenceResult.UNMARSHALING_ERROR;
+            logger.error("The data batch is null, nothing to send.");
+            return false;
+        }
+
+        // Send Correspondences
+        try {
+            ArrayList<Pair<String, ReceiptExternal>> receiptList = createAndSendCorrespondences(dataBatch);
+            boolean atLeastOneError = false;
+            for (Pair<String, ReceiptExternal> receiptPair : receiptList) {
+                if (receiptPair.getValue().getReceiptStatusCode() != ReceiptStatusEnum.OK) {
+                    atLeastOneError = true;
+                    logger.error("Error: " + receiptPair.getValue().getReceiptStatusCode() + " " +
+                            receiptPair.getValue().getReceiptText().getValue() + " " +
+                            "Unable to send correspondence with archive reference: " + receiptPair.getKey());
+                }
+            }
+            if (atLeastOneError) {
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Unable to send correspondence: " + e);
+            return false;
         }
 
         // Move from temp folder to archive
         try {
-            File destination = new File(this.archiveFolder.getPath() + "/" + dataBatchFolder.getName());
+            File destination = new File(this.archiveFolder.getPath() + File.separator + dataBatchFolder.getName());
             FileUtils.moveDirectory(dataBatchFolder, destination);
         } catch (IOException e) {
-            e.printStackTrace();
             logger.error("Unable to move the databatch folder to archive: " + e);
-            return CorrespondenceResult.MOVE_DATABATCH_ERROR;
         }
-
-        // Send Correspondence
-        try {
-            createAndSendCorrespondences(dataBatch);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("Unable to read the config file: " + e);
-        } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
-            logger.error("Unable to set dates: " + e);
-        }
-
-        return checkCorrespondenceStatusCodes();
+        return true;
     }
 
     private DataBatch unmarshalXML(File dataBatchFile) throws JAXBException, SAXException {
@@ -125,17 +172,9 @@ public class ScheduledTasks {
         return (DataBatch) unmarshaller.unmarshal(dataBatchFile);
     }
 
-    /**
-     * Creates and sends correspondence based on databatch. It also adds a pair of the receipt and status code to a
-     * collection. This list is used to catch and log errors that can occur during this process.
-     *
-     * @param dataBatch
-     * @throws IOException
-     * @throws DatatypeConfigurationException
-     * @throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage
-     */
-    private void createAndSendCorrespondences(DataBatch dataBatch) throws IOException,
+    private ArrayList<Pair<String, ReceiptExternal>> createAndSendCorrespondences(DataBatch dataBatch) throws IOException,
             DatatypeConfigurationException {
+        ArrayList<Pair<String, ReceiptExternal>> receiptList = new ArrayList<>();
 
         CorrespondenceClient correspondenceClient = new CorrespondenceClient();
 
@@ -143,69 +182,28 @@ public class ScheduledTasks {
             String archiveReference = dataUnit.getArchiveReference();
             String reportee = dataUnit.getReportee();
 
-            ReceiptExternal receipt;
+            ReceiptExternal receipt = null;
             try {
                 receipt = correspondenceClient.createAndSendCorrespondence(archiveReference, reportee);
             } catch (ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage e) {
                 e.printStackTrace();
                 logger.error("Something went wrong when sending correspondence: " + e);
-                return;
             }
-            this.archiveRefReceiptPairList.add(new Pair(archiveReference, receipt));
+            receiptList.add(new Pair(dataUnit.getArchiveReference(), receipt));
         }
+        return receiptList;
     }
 
-    /**
-     * As multiple correspondences are created and sent depending on the content of the data batch,
-     * it is important to track which ones that were not sent.
-     *
-     * @return Correspondence result codes.
-     */
-    private CorrespondenceResult checkCorrespondenceStatusCodes() {
-        boolean atLeastOneCorrespondenceFailed = false;
-        boolean atLeastOneCorrespondenceSucceeded = false;
-
-
-        for (Pair<String, ReceiptExternal> archiveRefReceiptPair : this.archiveRefReceiptPairList) {
-            if (archiveRefReceiptPair.getValue().getReceiptStatusCode() != ReceiptStatusEnum.OK) {
-                atLeastOneCorrespondenceFailed = true;
-                logger.error("Error: " + archiveRefReceiptPair.getValue().getReceiptStatusCode() + " " +
-                        archiveRefReceiptPair.getValue().getReceiptText().getValue() + " " +
-                        "Unable to send correspondence with archive reference: " + archiveRefReceiptPair.getKey());
-            } else {
-                atLeastOneCorrespondenceSucceeded = true;
-            }
-        }
-
-        if (atLeastOneCorrespondenceSucceeded && atLeastOneCorrespondenceFailed) {
-            return CorrespondenceResult.SOME_CORRESPONDENCES_FAILED;
-        }
-
-        if (atLeastOneCorrespondenceFailed && !atLeastOneCorrespondenceSucceeded) {
-            return CorrespondenceResult.ALL_CORRESPONDENCES_FAILED;
-        }
-
-        return CorrespondenceResult.OK;
-    }
-
-    private void moveToCorruptedFolder(File dataBatchFolder, boolean folderInArchive) {
+    private void moveToCorruptedFolder(File dataBatchFolder) {
         try {
-            String dataBatchFolderName = dataBatchFolder.getName();
-            File destination = new File(this.corruptedFolder.getPath() + "/" + dataBatchFolderName);
-            if (folderInArchive) {
-                File archivedFolder = new File(this.archiveFolder + "/" + dataBatchFolderName);
-                FileUtils.moveDirectory(archivedFolder, destination);
-            }
-            else{
-                FileUtils.moveDirectory(dataBatchFolder, destination);
-            }
+            File destination = new File(this.corruptedFolder.getPath() + "/" + dataBatchFolder.getName());
+            FileUtils.moveDirectory(dataBatchFolder, destination);
         } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("Unable to move the databatch folder to the corrupted folder: " + e);
+            logger.error("Unable to move the databatch folder(" + dataBatchFolder.getName() + ")to the corrupted folder: " + e);
         }
     }
 }
 
 enum CorrespondenceResult {
-    DATA_BATCH_ALREADY_ARCHIVED, UNMARSHALING_ERROR, MOVE_DATABATCH_ERROR, OK, SOME_CORRESPONDENCES_FAILED, ALL_CORRESPONDENCES_FAILED
+    CORRESPONDENCE_SUCCESS, CORRESPONDENCE_FAILED
 }

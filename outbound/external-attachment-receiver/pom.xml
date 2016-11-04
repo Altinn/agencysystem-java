@@ -9,7 +9,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <!--Uncomment this to make a deployable war-file-->
-
     <!--<packaging>war</packaging>-->
 
     <parent>
@@ -23,8 +22,8 @@
     </properties>
 
     <dependencies>
-        <!--Uncomment this to make a deployable war-file-->
 
+        <!--Uncomment this to make a deployable war-file-->
         <!--<dependency>-->
             <!--<groupId>javax.servlet</groupId>-->
             <!--<artifactId>javax.servlet-api</artifactId>-->
@@ -38,7 +37,6 @@
             <artifactId>spring-boot-starter-web-services</artifactId>
 
             <!--Uncomment this to make a deployable war-file-->
-
             <!--<exclusions>-->
                 <!--<exclusion>-->
                     <!--<groupId>org.springframework.boot</groupId>-->

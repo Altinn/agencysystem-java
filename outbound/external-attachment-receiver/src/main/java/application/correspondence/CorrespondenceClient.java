@@ -84,8 +84,6 @@ public class CorrespondenceClient {
         BindingProvider bp = (BindingProvider) port;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                 CORRESPONDENCE_ENDPOINT_URI);
-
-
     }
 
     /**

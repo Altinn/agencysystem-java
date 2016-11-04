@@ -20,8 +20,6 @@ import java.io.File;
 @EnableScheduling
 public class Application {
 
-    final static Logger logger = Logger.getLogger(Application.class);
-
     public static void main(String[] args) {
 
         File dataRootFolder = new File(Constants.DATA_ROOT_PATH);
@@ -44,7 +42,7 @@ public class Application {
         }
 
         if (corruptedFolder.mkdir()) {
-            System.out.println("\"corrupted\" folder created");
+            System.out.println("corrupted folder created");
         }
 
         SpringApplication.run(Application.class, args);
