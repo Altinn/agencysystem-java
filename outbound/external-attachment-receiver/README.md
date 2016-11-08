@@ -2,13 +2,13 @@
 This SOAP web service server is built using the Spring framework (https://spring.io/guides/gs/producing-web-service/).
 The web service consumes SOAP requests, performs XML-validation based on XSD-files, saves the payload + attachments to disk, and sends and creates correspondences.
 
-The services being used are:
+The services used are:
 - OnlineBatchReciever
 - CorrespondenceAgencyExternalBasic
 
 What you will need to run this project:
 
-- JDK 1.8 or later http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html
+- JDK 1.7 or later http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html
 - Maven 3.0+ https://maven.apache.org/download.cgi
 
 Both Java and Maven environment variables have to be set to run the application https://www.tutorialspoint.com/maven/maven_environment_setup.htm
