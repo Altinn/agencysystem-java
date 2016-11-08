@@ -23,9 +23,9 @@ How to run:
 1. Navigate to the project root folder "agencysystem-java/outbound/external-attachment-receiver/"
 2. Execute the command: **mvn clean package**. This will create a deployable war-file in the **target**-folder.
 3. Deploy the war-file on the server of your choice.
-4. The wsdl should now be accessible through **http://<ip-address>:<port>/external-attachment-receiver-1.0-SNAPSHOT/ws/externalattachment.wsdl**
+4. The wsdl should now be accessible through **http://\<ip-address>:\<port>/external-attachment-receiver-1.0-SNAPSHOT/ws/externalattachment.wsdl**
 
-The soap-ui-tests folder contains a package of tests that can be imported into SOAP UI to test the endpoint.
+The soap-ui-tests folder contains a sample request that can be imported into SOAP UI to test the endpoint.
 
 Incomming data batches are stored in a temp-data folder, before being moved to an archive-folder when the correspondences have been successfully delivered. If something went wrong during the correspondence process, the data batch will be moved to a corrupted folder.
 
