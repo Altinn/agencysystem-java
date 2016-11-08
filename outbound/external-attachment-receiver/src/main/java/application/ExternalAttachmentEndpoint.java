@@ -15,7 +15,7 @@ import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
  */
 
 /**
- * This class contains the endpoint that receives the incoming requests. It passes the request to the handler-class,
+ * This class contains the endpoint that receives the incoming requests from Altinn. It passes the request to the handler-class,
  * which processes the request and generates a receipt.
  */
 @Endpoint
@@ -38,7 +38,7 @@ public class ExternalAttachmentEndpoint {
      * @param request The request containing DataBatch and Attachments received from Altinn.
      * @return Returns a response message; OK, FAILED or FAILED_DO_NOT_REPLY. OK = The data has been successfully
      * stored, FAILED = internal failure at the receiving end, FAILED_DO_NOT_REPLY = Faults with incoming XML schema, or
-     * the schema already exists.
+     * the data batch already exists.
      */
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ReceiveOnlineBatchExternalAttachment")
     @ResponsePayload

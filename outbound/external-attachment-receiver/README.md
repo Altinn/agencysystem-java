@@ -1,6 +1,10 @@
 # External Attachment Receiver
 This SOAP web service server is built using the Spring framework (https://spring.io/guides/gs/producing-web-service/).
-The web service consumes SOAP requests, performs XML-validation based on XSD-files, and saves the payload + attachments to disk. The payload and attachments will be written to a "data" folder in the server root folder.
+The web service consumes SOAP requests, performs XML-validation based on XSD-files, saves the payload + attachments to disk, and sends and creates correspondences.
+
+The services being used are:
+- OnlineBatchReciever
+- CorrespondenceAgencyExternalBasic
 
 What you will need to run this project:
 
@@ -9,28 +13,26 @@ What you will need to run this project:
 
 Both Java and Maven environment variables have to be set to run the application https://www.tutorialspoint.com/maven/maven_environment_setup.htm
 
-The application utilizes Spring Boot which embeds a Tomcat server within an executable .jar file. This means there is no need to install a specific server to run the application locally.
+Before packaging and deploying the application, configure the following java-file: **src/main/java/application/util/Constants.java**
+Set the path constants to where you want the data batches to be stored.
+Also configure the properties-file **src/main/resources/log4j.properties**. Set the "log4j.appender.file.File" attribute to where you want the log file to be stored.
 
 How to run:
 
 1. Clone the project: https://github.com/Altinn/agencysystem-java.git
 1. Navigate to the project root folder "agencysystem-java/outbound/external-attachment-receiver/"
-2. Execute the command: **mvn clean package spring-boot:run**
-This will automatically create an executable jar, and run in it on the defualt port 8080
-
-How to change the default port:
-
-- Navigate to the project root folder
-- Execute the command: **mvn clean package**
-- Execute the command: **java -jar target/external-attachment-receiver-1.0-SNAPSHOT.jar --server.port="port number"** 
+2. Execute the command: **mvn clean package**. This will create a deployable war-file in the **target**-folder.
+3. Deploy the war-file on the server of your choice.
+4. The wsdl should now be accessible through **http://<ip-address>:<port>/external-attachment-receiver-1.0-SNAPSHOT/ws/externalattachment.wsdl**
 
 The soap-ui-tests folder contains a package of tests that can be imported into SOAP UI to test the endpoint.
 
-Errors are written to a logging file in the server root folder.
+Incomming data batches are stored in a temp-data folder, before being moved to an archive-folder when the correspondences have been successfully delivered. If something went wrong during the correspondence process, the data batch will be moved to a corrupted folder.
+
 
 The javadoc folder contains documentation of application package.
 
 How to test:
 
-1. Import **external-attachment-receiver-tests.zip** from "agencysystem-java/outbound/external-attachment-receiver/soap-ui-tests" into soap UI.
-2. Run any of the tests toward the running server. E.g. http://localhost:8080/ws
+1. Import **external-attachment-receiver-soapui-project.xml** from "agencysystem-java/outbound/external-attachment-receiver/soap-ui-tests" into soap UI.
+2. Run Request 1 towards the running server. E.g. http://localhost:8080/external-attachment-receiver-1.0-SNAPSHOT/ws

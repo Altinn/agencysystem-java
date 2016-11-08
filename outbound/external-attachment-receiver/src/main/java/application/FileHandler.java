@@ -33,11 +33,6 @@ public class FileHandler {
      * @throws IOException Throws an exception if it fails to write to disk.
      */
     public File write(String dataBatch, byte[] attachments) throws IOException {
-
-        // Create directory
-        File directoryPath = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference);
-        directoryPath.mkdir();
-
         if (attachments != null && attachments.length != 0) {
             File attachmentPath = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference + "/" + receiversReference + ".zip");
             FileUtils.writeByteArrayToFile(attachmentPath, attachments);
@@ -57,13 +52,19 @@ public class FileHandler {
     public boolean fileExists() {
         File dataBatachArchiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH + "/" + receiversReference);
         if (dataBatachArchiveFolder.exists()) {
-            logger.info("A file with the same receivers reference(" + dataBatachArchiveFolder.getPath() +")already exists; do not write to disk");
+            logger.error("A file with the same receivers reference(" + dataBatachArchiveFolder.getPath() + ")already exists; do not write to disk");
             return true;
         }
 
         File dataBatachCorruptFolder = new File(Constants.CORRUPT_DIRECTORY_PATH + "/" + receiversReference);
         if (dataBatachCorruptFolder.exists()) {
-            logger.info("A file with the same receivers reference(" + dataBatachCorruptFolder.getPath() +")already exists; do not write to disk");
+            logger.error("A file with the same receivers reference(" + dataBatachCorruptFolder.getPath() + ")already exists; do not write to disk");
+            return true;
+        }
+
+        File dataBatachTempFolder = new File(Constants.TEMP_DATA_PATH + "/" + receiversReference);
+        if (dataBatachCorruptFolder.exists()) {
+            logger.error("A file with the same receivers reference(" + dataBatachTempFolder.getPath() + ")already exists; do not write to disk");
             return true;
         }
         return false;

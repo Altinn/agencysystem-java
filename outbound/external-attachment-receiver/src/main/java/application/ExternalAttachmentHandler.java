@@ -28,7 +28,7 @@ public class ExternalAttachmentHandler {
     final static Logger logger = Logger.getLogger(ExternalAttachmentHandler.class);
 
     /**
-     * Processes the request, by validating the databatch, checking for uniqueness and writing to disk.
+     * Processes the request, by validating the data batch, checking for uniqueness and writing to disk.
      *
      * @param request The request parameter contains all data received from Altinn.
      * @return A response code; OK, FAILED or FAILED_DO_NOT_RETRY

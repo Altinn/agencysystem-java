@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="ee807805-5121-470d-af77-c6b10c15e321" activeEnvironment="Default" name="external-attachment-receiver" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="cd37ebab-da63-4617-af59-5d33be1d2479" wsaVersion="NONE" name="OnlineBatchReceiverSoap12" type="wsdl" bindingName="{http://AltInn.no/webservices/}OnlineBatchReceiverSoap12" soapVersion="1_2" anonymous="optional" definition="file:/C:/Users/andreas.naess/Desktop/soap-ui-tests/OnlineBatchReciever.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache/><con:endpoints><con:endpoint>http://localhost/OnlineBatchReceiver/OnlineBatchReceiver.asmx</con:endpoint></con:endpoints><con:operation id="288bafa5-1db4-451a-9ec1-63d68c5cce43" isOneWay="false" action="http://AltInn.no/webservices/ReceiveOnlineBatchExternalAttachment" name="ReceiveOnlineBatchExternalAttachment" bindingOperationName="ReceiveOnlineBatchExternalAttachment" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="30abf5ee-e49d-41f3-bad5-fdab9a9a09fa" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost/OnlineBatchReceiver/OnlineBatchReceiver.asmx</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:web="http://AltInn.no/webservices/">\r
+   <soap:Header/>\r
+   <soap:Body>\r
+      <web:ReceiveOnlineBatchExternalAttachment>\r
+         <!--Optional:-->\r
+         <web:username>?</web:username>\r
+         <!--Optional:-->\r
+         <web:passwd>?</web:passwd>\r
+         <!--Optional:-->\r
+         <web:receiversReference>?</web:receiversReference>\r
+         <web:sequenceNumber>?</web:sequenceNumber>\r
+         <!--Optional:-->\r
+         <web:batch>?</web:batch>\r
+         <!--Optional:-->\r
+         <web:attachments>cid:1235363775645</web:attachments>\r
+      </web:ReceiveOnlineBatchExternalAttachment>\r
+   </soap:Body>\r
+</soap:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://AltInn.no/webservices/OnlineBatchReceiverSoap/ReceiveOnlineBatchExternalAttachmentRequest"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="8e724932-2bf5-440e-8f8b-a6a1a9ff95e1" wsaVersion="NONE" name="OnlineBatchReceiverSoap" type="wsdl" bindingName="{http://AltInn.no/webservices/}OnlineBatchReceiverSoap" soapVersion="1_1" anonymous="optional" definition="file:/C:/Users/andreas.naess/Desktop/soap-ui-tests/OnlineBatchReciever.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/C:/Users/andreas.naess/Desktop/soap-ui-tests/OnlineBatchReciever.wsdl"><con:part><con:url>file:/C:/Users/andreas.naess/Desktop/soap-ui-tests/OnlineBatchReciever.wsdl</con:url><con:content><![CDATA[<wsdl:definitions targetNamespace="http://AltInn.no/webservices/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://AltInn.no/webservices/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://AltInn.no/webservices/">
+      <s:element name="ReceiveOnlineBatchExternalAttachment">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="username" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="passwd" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="receiversReference" type="s:string"/>
+            <s:element minOccurs="1" maxOccurs="1" name="sequenceNumber" type="s:long"/>
+            <s:element minOccurs="0" maxOccurs="1" name="batch" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="attachments" type="s:base64Binary"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReceiveOnlineBatchExternalAttachmentResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReceiveOnlineBatchExternalAttachmentResult" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ReceiveOnlineBatchExternalAttachmentSoapIn">
+    <wsdl:part name="parameters" element="tns:ReceiveOnlineBatchExternalAttachment"/>
+  </wsdl:message>
+  <wsdl:message name="ReceiveOnlineBatchExternalAttachmentSoapOut">
+    <wsdl:part name="parameters" element="tns:ReceiveOnlineBatchExternalAttachmentResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="OnlineBatchReceiverSoap">
+    <wsdl:operation name="ReceiveOnlineBatchExternalAttachment">
+      <wsdl:input message="tns:ReceiveOnlineBatchExternalAttachmentSoapIn"/>
+      <wsdl:output message="tns:ReceiveOnlineBatchExternalAttachmentSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="OnlineBatchReceiverSoap" type="tns:OnlineBatchReceiverSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ReceiveOnlineBatchExternalAttachment">
+      <soap:operation soapAction="http://AltInn.no/webservices/ReceiveOnlineBatchExternalAttachment" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="OnlineBatchReceiverSoap12" type="tns:OnlineBatchReceiverSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ReceiveOnlineBatchExternalAttachment">
+      <soap12:operation soapAction="http://AltInn.no/webservices/ReceiveOnlineBatchExternalAttachment" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OnlineBatchReceiver">
+    <wsdl:port name="OnlineBatchReceiverSoap" binding="tns:OnlineBatchReceiverSoap">
+      <soap:address location="http://localhost/OnlineBatchReceiver/OnlineBatchReceiver.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="OnlineBatchReceiverSoap12" binding="tns:OnlineBatchReceiverSoap12">
+      <soap12:address location="http://localhost/OnlineBatchReceiver/OnlineBatchReceiver.asmx"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost/OnlineBatchReceiver/OnlineBatchReceiver.asmx</con:endpoint></con:endpoints><con:operation id="1162e61e-bc8d-4998-822d-9804ec907fe4" isOneWay="false" action="http://AltInn.no/webservices/ReceiveOnlineBatchExternalAttachment" name="ReceiveOnlineBatchExternalAttachment" bindingOperationName="ReceiveOnlineBatchExternalAttachment" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="2e833307-4c73-46f3-8e31-39e40327fd8a" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://altetat02.brreg.no:28080/external-attachment-receiver-1.0-SNAPSHOT/ws</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://AltInn.no/webservices/">
+	<soapenv:Header/>
+	<soapenv:Body>
+		<web:ReceiveOnlineBatchExternalAttachment xmlns:web="http://AltInn.no/webservices/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xsi:schemaLocation="http://AltInn.no/webservices/ ">
+			<web:username xsi:type="xsd:string">Altinn</web:username>
+			<web:passwd xsi:type="xsd:string">1234567</web:passwd>
+			<web:receiversReference xsi:type="xsd:string">${=java.util.UUID.randomUUID()}</web:receiversReference>
+			<web:sequenceNumber xsi:type="xsd:long">0</web:sequenceNumber>
+			<web:batch xsi:type="xsd:string">&lt;DataBatch schemaVersion=&quot;1.0&quot; batchReference=&quot;0&quot; previousReference=&quot;0&quot; receiverReference=&quot;f5c7892e-e4ff-4820-98eb-38641fb983b3&quot; timeStamp=&quot;2015-09-15T13:30:51&quot; formTasksInBatch=&quot;1&quot;&gt;
+	&lt;DataUnits&gt;
+		&lt;DataUnit reportee=&quot;06117701547&quot;
+		archiveReference=&quot;AR1328867&quot; archiveTimeStamp=&quot;2015-09-15T13:30:48.91&quot;&gt;
+			&lt;Approvers&gt;
+				&lt;Approver approverId=&quot;06117701547&quot; approvedTimeStamp=&quot;2015-09-15T13:30:48.833&quot; securityLevel=&quot;lessSensitive&quot;/&gt;
+			&lt;/Approvers&gt;
+			&lt;FormTask&gt;
+				&lt;ServiceCode&gt;3903&lt;/ServiceCode&gt;
+				&lt;ServiceEditionCode&gt;150512&lt;/ServiceEditionCode&gt;
+				&lt;Form&gt;
+					&lt;DataFormatId&gt;1243&lt;/DataFormatId&gt;
+					&lt;DataFormatVersion&gt;10656&lt;/DataFormatVersion&gt;
+					&lt;Reference&gt;39815&lt;/Reference&gt;
+					&lt;ParentReference&gt;0&lt;/ParentReference&gt;
+					&lt;FormData&gt;
+						&lt;![CDATA[&lt;Skjema xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:brreg=&quot;http://www.brreg.no/or&quot;
+		xmlns:dfs=&quot;http://schemas.microsoft.com/office/infopath/2003/dataFormSolution&quot; xmlns:tns=&quot;http://www.altinn.no/services/ServiceEngine/ServiceMetaData/2009/10&quot;
+		xmlns:q1=&quot;http://schemas.altinn.no/services/ServiceEngine/ServiceMetaData/2009/10&quot; xmlns:ns1=&quot;http://www.altinn.no/services/Register/ER/2009/10&quot;
+		xmlns:ns2=&quot;http://schemas.altinn.no/services/Register/2009/10&quot; xmlns:ns3=&quot;http://www.altinn.no/services/2009/10&quot;
+		xmlns:q3=&quot;http://www.altinn.no/services/common/fault/2009/10&quot; xmlns:ns4=&quot;http://schemas.microsoft.com/2003/10/Serialization/&quot;
+		xmlns:my=&quot;http://schemas.microsoft.com/office/infopath/2003/myXSD/2010-02-11T08:42:27&quot; xmlns:xd=&quot;http://schemas.microsoft.com/office/infopath/2003&quot;
+		skjemanummer=&quot;1243&quot; spesifikasjonsnummer=&quot;10656&quot; blankettnummer=&quot;RF-1117&quot; tittel=&quot;Klage
+		på likningen&quot; gruppeid=&quot;5800&quot; etatid=&quot;NoAgency&quot;&gt;
+	&lt;Skattyterinfor-grp-5801 gruppeid=&quot;5801&quot;&gt;
+		&lt;info-grp-5802 gruppeid=&quot;5802&quot;/&gt;
+		&lt;Kontakt-grp-5803 gruppeid=&quot;5803&quot;&gt;
+			&lt;KontaktpersonEPost-datadef-27688 orid=&quot;27688&quot;&gt;xxx@yyy.no&lt;/KontaktpersonEPost-datadef-27688&gt;
+			&lt;Samtykke_Skatt-datadef-30001&gt;2&lt;/Samtykke_Skatt-datadef-30001&gt;
+			&lt;Samtykke_Folkeregister-datadef-30002&gt;2&lt;/Samtykke_Folkeregister-datadef-30002&gt;
+		&lt;/Kontakt-grp-5803&gt;
+		&lt;klagefrist-grp-5804 gruppeid=&quot;5804&quot;&gt;
+			&lt;KlageGjeldendeInntektsar-datadef-25455 orid=&quot;25455&quot;&gt;2014&lt;/KlageGjeldendeInntektsar-datadef-25455&gt;
+			&lt;KlagemeldingSendtInnenKlagefrist-datadef-25454 orid=&quot;25454&quot;&gt;Ja&lt;/KlagemeldingSendtInnenKlagefrist-datadef-25454&gt;
+		&lt;/klagefrist-grp-5804&gt;
+	&lt;/Skattyterinfor-grp-5801&gt;
+	&lt;klage-grp-5805 gruppeid=&quot;5805&quot;&gt;
+		&lt;spesifisering-grp-5836 gruppeid=&quot;5836&quot;&gt;
+			&lt;KlageSpesifisering-datadef-25457 orid=&quot;25457&quot;&gt;3t5q5&lt;/KlageSpesifisering-datadef-25457&gt;
+		&lt;/spesifisering-grp-5836&gt;
+	&lt;/klage-grp-5805&gt;
+&lt;/Skjema&gt;]]&gt;
+					&lt;/FormData&gt;
+				&lt;/Form&gt;
+			&lt;/FormTask&gt;
+		&lt;/DataUnit&gt;
+	&lt;/DataUnits&gt;
+&lt;/DataBatch&gt;</web:batch>
+			<web:attachments/>
+		</web:ReceiveOnlineBatchExternalAttachment>
+	</soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://AltInn.no/webservices/ReceiveOnlineBatchExternalAttachment"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

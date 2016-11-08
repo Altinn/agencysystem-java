@@ -24,8 +24,9 @@ public class WebServiceConfig extends WsConfigurerAdapter {
 
     /**
      * Configures the endpoint url. The endpoint is reached from the following url: http://ip-address:port/ws/
-     * @param applicationContext
-     * @return
+     * @param applicationContext The ApplicationContext is the central interface within a Spring application for
+     * providing configuration information to the application.
+     * @return A servlet mapping used to configure the endpoint URL
      */
     @Bean
     public ServletRegistrationBean messageDispatcherServlet(ApplicationContext applicationContext) {

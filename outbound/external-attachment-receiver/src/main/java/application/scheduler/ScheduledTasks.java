@@ -4,7 +4,6 @@ import application.correspondence.CorrespondenceClient;
 import application.util.Constants;
 import generated.DataBatch;
 import generated.DataUnit;
-import javafx.util.Pair;
 import no.altinn.schemas.services.intermediary.receipt._2009._10.ReceiptExternal;
 import no.altinn.schemas.services.intermediary.receipt._2009._10.ReceiptStatusEnum;
 import no.altinn.services.serviceengine.correspondence._2009._10.ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage;
@@ -24,7 +23,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -52,9 +53,33 @@ public class ScheduledTasks {
     private Path dir;
 
     public ScheduledTasks() {
+
+        File appRootFolder = new File(Constants.APP_ROOT_PATH);
+        File rootDataFolder = new File(Constants.DATA_ROOT_PATH);
         this.tempDataFolder = new File(Constants.TEMP_DATA_PATH);
         this.archiveFolder = new File(Constants.ARCHIVE_DIRECTORY_PATH);
         this.corruptedFolder = new File(Constants.CORRUPT_DIRECTORY_PATH);
+
+        // This is only true the first the application runs
+        if (appRootFolder.mkdir()) {
+            System.out.println("app-root folder created");
+        }
+
+        if (rootDataFolder.mkdir()) {
+            System.out.println("root-data folder created");
+        }
+
+        if (tempDataFolder.mkdir()) {
+            System.out.println("temp-data folder created");
+        }
+
+        if (archiveFolder.mkdir()) {
+            System.out.println("archive folder created");
+        }
+
+        if (corruptedFolder.mkdir()) {
+            System.out.println("corrupted folder created");
+        }
 
         try {
             this.watcher = FileSystems.getDefault().newWatchService();
@@ -138,20 +163,32 @@ public class ScheduledTasks {
 
         // Send Correspondences
         try {
-            ArrayList<Pair<String, ReceiptExternal>> receiptList = createAndSendCorrespondences(dataBatch);
+            HashMap<String, ReceiptExternal> receiptList = createAndSendCorrespondences(dataBatch);
+
             boolean atLeastOneError = false;
-            for (Pair<String, ReceiptExternal> receiptPair : receiptList) {
-                if (receiptPair.getValue().getReceiptStatusCode() != ReceiptStatusEnum.OK) {
+
+            Iterator it = receiptList.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry receiptPair = (Map.Entry) it.next();
+
+                ReceiptExternal receiptExternal = (ReceiptExternal) receiptPair.getValue();
+                String archiveReference = (String) receiptPair.getKey();
+
+                if (receiptExternal.getReceiptStatusCode() != ReceiptStatusEnum.OK) {
                     atLeastOneError = true;
-                    logger.error("Error: " + receiptPair.getValue().getReceiptStatusCode() + " " +
-                            receiptPair.getValue().getReceiptText().getValue() + " " +
-                            "Unable to send correspondence with archive reference: " + receiptPair.getKey());
+                    logger.error("Error: " + receiptExternal.getReceiptStatusCode() + " " +
+                            receiptExternal.getReceiptText().getValue() + " " +
+                            "Unable to send correspondence with archive reference: " + archiveReference);
                 }
+
+                it.remove(); // avoids a ConcurrentModificationException
             }
+
             if (atLeastOneError) {
                 return false;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("Unable to send correspondence: " + e);
             return false;
         }
@@ -172,9 +209,9 @@ public class ScheduledTasks {
         return (DataBatch) unmarshaller.unmarshal(dataBatchFile);
     }
 
-    private ArrayList<Pair<String, ReceiptExternal>> createAndSendCorrespondences(DataBatch dataBatch) throws IOException,
+    private HashMap<String, ReceiptExternal> createAndSendCorrespondences(DataBatch dataBatch) throws IOException,
             DatatypeConfigurationException {
-        ArrayList<Pair<String, ReceiptExternal>> receiptList = new ArrayList<>();
+        HashMap<String, ReceiptExternal> map = new HashMap<>();
 
         CorrespondenceClient correspondenceClient = new CorrespondenceClient();
 
@@ -189,9 +226,9 @@ public class ScheduledTasks {
                 logger.error("Something went wrong when sending correspondence: " + e);
                 continue;
             }
-            receiptList.add(new Pair(dataUnit.getArchiveReference(), receipt));
+            map.put(dataUnit.getArchiveReference(), receipt);
         }
-        return receiptList;
+        return map;
     }
 
     private void moveToCorruptedFolder(File dataBatchFolder) {

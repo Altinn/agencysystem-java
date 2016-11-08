@@ -19,6 +19,13 @@ import java.util.*;
 /**
  * Created by andreas.naess on 28.10.2016.
  */
+
+/**
+ * This class interacts with the correspondence web service. For this communication to work, java classes will have to
+ * be generated from the "CorrespondenceAgencyExternalBasic.wsdl". The classes are automatically generated when executing the
+ * "mvn clean package" command. The cxf-plugin with goal: wsdl2java handles this. As the classes are auto-generated,
+ * they are put in the "target/generated-sources/cxf" directory, and will be remade with the maven "clean" command.
+ */
 public class CorrespondenceClient {
 
     // Agency properties
@@ -47,6 +54,7 @@ public class CorrespondenceClient {
             "https://tt02.altinn.basefarm.net/ServiceEngineExternal/CorrespondenceAgencyExternalBasic.svc";
 
     public CorrespondenceClient() throws IOException, DatatypeConfigurationException {
+
 
         Properties properties = new Properties();
 
@@ -81,18 +89,20 @@ public class CorrespondenceClient {
         this.dueDateTime = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 
         this.port = new CorrespondenceAgencyExternalBasicSF().getBasicHttpBindingICorrespondenceAgencyExternalBasic();
+
         BindingProvider bp = (BindingProvider) port;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                 CORRESPONDENCE_ENDPOINT_URI);
     }
 
     /**
-     * Creates and sends a correspondence after processing the databatch.
+     * Creates and sends a correspondence after processing the data batch.
      *
      * @param archiveReference The data batch archive reference
-     * @param reportee         The organization that should receive the correspondence
-     * @return
-     * @throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage
+     * @param reportee         The end user that should receive the correspondence
+     * @return A receipt indicating the status of the correspondence delivery
+     * @throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage Throws an
+     * exception if it failed to send the correspondence.
      */
     public ReceiptExternal createAndSendCorrespondence(String archiveReference, String reportee)
             throws ICorrespondenceAgencyExternalBasicInsertCorrespondenceBasicV2AltinnFaultFaultFaultMessage {

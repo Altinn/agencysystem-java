@@ -8,8 +8,8 @@
     <artifactId>external-attachment-receiver</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!--Uncomment this to make a deployable war-file-->
-    <!--<packaging>war</packaging>-->
+    <!--Comment this to make a runnable jar-file-->
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -23,26 +23,26 @@
 
     <dependencies>
 
-        <!--Uncomment this to make a deployable war-file-->
-        <!--<dependency>-->
-            <!--<groupId>javax.servlet</groupId>-->
-            <!--<artifactId>javax.servlet-api</artifactId>-->
-            <!--<version>3.0.1</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
+        <!--Comment this to make a runnable jar-file-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- tag::springws[] -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
 
-            <!--Uncomment this to make a deployable war-file-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.springframework.boot</groupId>-->
-                    <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
+            <!--Comment this to make a runnable jar-file-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -125,9 +125,11 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/wsdl/OnlineBatchReciever.wsdl</wsdl>
+                                    <wsdlLocation>classpath:wsdl/OnlineBatchReciever.wsdl</wsdlLocation>
                                 </wsdlOption>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/main/resources/wsdl/CorrespondenceAgencyExternalBasic.wsdl</wsdl>
+                                    <wsdlLocation>classpath:wsdl/CorrespondenceAgencyExternalBasic.wsdl</wsdlLocation>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
